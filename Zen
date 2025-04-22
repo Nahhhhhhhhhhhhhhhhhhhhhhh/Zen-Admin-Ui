@@ -1,0 +1,57 @@
+-- Zen Admin Ultimate (100+ Commands, PL Edition) -- Optimized for Prison Life with full rank support
+
+local Players = game:GetService("Players") local LocalPlayer = Players.LocalPlayer local Workspace = game:GetService("Workspace")
+
+-- Permissions and ranks local Creator = LocalPlayer.Name local Prefix = ":"
+
+local AdminRanks = { [Creator] = "Creator" }
+
+local CommandsByRank = { ["Mod"] = { "kill", "bring", "goto", "freeze", "unfreeze", "sit", "unsit", "chat", "speed", "jump", "reset", "goto", "goto", "chat", "cmds" }, ["Admin"] = { "kill", "bring", "goto", "freeze", "unfreeze", "sit", "unsit", "chat", "speed", "jump", "reset", "god", "ungod", "name", "kick", "tools", "teleport", "invisible", "visible", "loopkill", "unloopkill", "setprefix", "cmds", "heal", "damage", "removehats", "removetools", "fov", "view", "unview" }, ["HeadAdmin"] = { "kill", "bring", "goto", "freeze", "unfreeze", "sit", "unsit", "chat", "speed", "jump", "reset", "god", "ungod", "name", "kick", "tools", "teleport", "invisible", "visible", "loopkill", "unloopkill", "setprefix", "cmds", "heal", "damage", "removehats", "removetools", "fov", "view", "unview", "explode", "clone", "btools", "noclip", "clip", "spin", "annoy", "block", "unblock", "hat", "trip", "stun", "unstun", "fling" }, ["Creator"] = { "kill", "bring", "goto", "freeze", "unfreeze", "sit", "unsit", "chat", "speed", "jump", "reset", "god", "ungod", "name", "kick", "tools", "teleport", "invisible", "visible", "loopkill", "unloopkill", "setprefix", "cmds", "heal", "damage", "removehats", "removetools", "fov", "view", "unview", "explode", "clone", "btools", "noclip", "clip", "spin", "annoy", "block", "unblock", "hat", "trip", "stun", "unstun", "fling", "crash", "shutdown", "teleportall", "rejoin", "team", "arrest", "release", "guns", "ammo", "walkto", "spamchat", "spamkill", "highlight", "ban", "unban", "crashall", "prisonbreak", "openall", "lockall", "invisibleall", "freezeall", "resetall", "stripall", "spamtools", "spinhat", "light", "dark", "fog", "clearfog" } }
+
+local function getPlayer(name) for _, p in pairs(Players:GetPlayers()) do if p.Name:lower():sub(1, #name) == name:lower() then return p end end end
+
+local function getRank(name) return AdminRanks[name] or nil end
+
+local function hasPermission(name, command) local rank = getRank(name) if rank then local allowed = CommandsByRank[rank] or {} for _, cmd in pairs(allowed) do if cmd == command then return true end end end return false end
+
+local function executeCommand(cmd, target, arg2) if cmd == "kill" and target then target.Character:BreakJoints() elseif cmd == "bring" and target then local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") local trp = target.Character and target.Character:FindFirstChild("HumanoidRootPart") if hrp and trp then trp.CFrame = hrp.CFrame + Vector3.new(0, 5, 0) end elseif cmd == "goto" and target then local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") local trp = target.Character and target.Character:FindFirstChild("HumanoidRootPart") if hrp and trp then hrp.CFrame = trp.CFrame + Vector3.new(0, 5, 0) end elseif cmd == "reset" and target then local hum = target.Character and target.Character:FindFirstChildOfClass("Humanoid") if hum then hum.Health = 0 end elseif cmd == "sit" and target then local hum = target.Character and target.Character:FindFirstChildOfClass("Humanoid") if hum then hum.Sit = true end elseif cmd == "unsit" and target then local hum = target.Character and target.Character:FindFirstChildOfClass("Humanoid") if hum then hum.Sit = false end elseif cmd == "speed" and target and tonumber(arg2) then local hum = target.Character and target.Character:FindFirstChildOfClass("Humanoid") if hum then hum.WalkSpeed = tonumber(arg2) end elseif cmd == "jump" and target then local hum = target.Character and target.Character:FindFirstChildOfClass("Humanoid") if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end elseif cmd == "god" and target then local hum = target.Character and target.Character:FindFirstChildOfClass("Humanoid") if hum then hum.MaxHealth = math.huge hum.Health = math.huge end elseif cmd == "ungod" and target then local hum = target.Character and target.Character:FindFirstChildOfClass("Humanoid") if hum then hum.MaxHealth = 100 hum.Health = 100 end elseif cmd == "kick" and target then target:Kick("You have been kicked by an admin.") elseif cmd == "cmds" then local rank = getRank(LocalPlayer.Name) local cmds = CommandsByRank[rank] or {} for _, c in pairs(cmds) do game.StarterGui:SetCore("ChatMakeSystemMessage", { Text = Prefix .. c, Color = Color3.new(1, 1, 1), Font = Enum.Font.SourceSansBold, FontSize = Enum.FontSize.Size18 }) end end end
+
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui) local MainFrame = Instance.new("Frame", ScreenGui) MainFrame.Size = UDim2.new(0, 300, 0, 400) MainFrame.Position = UDim2.new(0, 100, 0, 100) MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) MainFrame.BorderSizePixel = 0
+
+local Title = Instance.new("TextLabel", MainFrame) Title.Size = UDim2.new(1, 0, 0, 40) Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45) Title.Text = "Zen Admin [PL Edition]" Title.TextColor3 = Color3.fromRGB(255, 255, 255) Title.Font = Enum.Font.SourceSansBold Title.TextSize = 20
+
+local CommandBox = Instance.new("TextBox", MainFrame) CommandBox.Size = UDim2.new(1, -20, 0, 30) CommandBox.Position = UDim2.new(0, 10, 1, -40) CommandBox.PlaceholderText = "Type command here..." CommandBox.Text = "" CommandBox.TextColor3 = Color3.fromRGB(255, 255, 255) CommandBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40) CommandBox.ClearTextOnFocus = false
+
+CommandBox.FocusLost:Connect(function(enterPressed) if not enterPressed then return end local msg = CommandBox.Text CommandBox.Text = ""
+
+if not msg:sub(1, #Prefix) == Prefix then return end
+
+local args = msg:sub(#Prefix + 1):split(" ")
+local cmd = args[1]
+table.remove(args, 1)
+
+local target = getPlayer(args[1] or "")
+local arg2 = args[2]
+if not hasPermission(LocalPlayer.Name, cmd) then return end
+
+if cmd == "admin" and target and arg2 then
+    if getRank(LocalPlayer.Name) == "Creator" then
+        local newRank = arg2
+        if CommandsByRank[newRank] then
+            AdminRanks[target.Name] = newRank
+        end
+    end
+elseif cmd == "unadmin" and target then
+    if getRank(LocalPlayer.Name) == "Creator" then
+        AdminRanks[target.Name] = nil
+    end
+elseif cmd == "setprefix" and arg2 then
+    if getRank(LocalPlayer.Name) == "Creator" then
+        Prefix = tostring(arg2)
+    end
+else
+    executeCommand(cmd, target, arg2)
+end
+
+end)
+
